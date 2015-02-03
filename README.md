@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/Confluex/confluex-mock-http.png?branch=master)](https://travis-ci.org/Confluex/confluex-mock-http)
+[![Build Status](https://travis-ci.org/shamsoftware/sham-http.png?branch=master)](https://travis-ci.org/shamsoftware/sham-http)
 
-# Confluex Mock HTTP API
+# sham.software Mock HTTP API
 
 Mock HTTP testing library for stubbing HTTP responses from text or resources on the classpath (xml files, etc.) and
 verification of client behavior and state.
 
-This library is still under heavy development. Feel free to use, contribute but there could be changes to
+This library is still under development. Feel free to use, contribute but there could be changes to
 the API until it reaches 1.0 status. Of course, we'll try to keep breaking changes to a minimum.
 
 **Table of Contents**
@@ -25,19 +25,19 @@ no Groovy requirement (Groovy is great and you should really check it out though
 
 ```xml
 <dependency>
-  <groupId>com.confluex</groupId>
-  <artifactId>confluex-mock-http</artifactId>
-  <version>0.4.3</version>
+  <groupId>software.sham</groupId>
+  <artifactId>sham-http</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
-The artifacts are available in the [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22confluex-mock-http%22).
+The artifacts are available in the [Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22sham-http%22).
 
 ### Manual
 
 If you need to add this to your project manually, you can download it directly from the maven central repository:
 
-[Download Jar](http://search.maven.org/remotecontent?filepath=com/confluex/confluex-mock-http/0.4.0/confluex-mock-http-0.4.0.jar)
+[Download Jar](http://search.maven.org/remotecontent?filepath=software/sham/sham-http/1.0.0/sham-http-1.0.0.jar)
 
 
 ## Example Usage
@@ -50,7 +50,7 @@ which you'll likely want to use to maintain readability in your tests:
 ```groovy
 
 import static javax.servlet.http.HttpServletResponse.*
-import static com.confluex.mock.http.matchers.HttpMatchers.*
+import static software.sham.http.matchers.HttpMatchers.*
 import static org.hamcrest.Matchers.*
 
 ```
@@ -64,8 +64,8 @@ you provided.
 
 ```groovy
 
-import com.confluex.mock.http.MockHttpServer
-import static com.confluex.mock.http.matchers.HttpMatchers.*
+import software.sham.http.MockHttpServer
+import static software.sham.http.matchers.HttpMatchers.*
 
 MockHttpServer server = new MockHttpServer(8080)
 server.respondTo(anyRequest()).withBody('Hello World!')
@@ -201,8 +201,8 @@ int thePortItChose = server.port
 ### Supporting SSL
 
 To mock an HTTPS server, use MockHttpsServer in the place of MockHttpServer.  Your HTTPS client will need to use
-a keystore that contains the mock server's certificate.  confluex-mock.keystore is available on the classpath,
-and its password is confluex.
+a keystore that contains the mock server's certificate.  sham.keystore is available on the classpath,
+and its password is sham.
 
 ```groovy
 
@@ -211,7 +211,7 @@ MockHttpsServer server = new MockHttpsServer(443)
 ```
 # License
 
-   Copyright 2013 Confluex, Inc.
+   Copyright 2015 Ryan Hoegg.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
