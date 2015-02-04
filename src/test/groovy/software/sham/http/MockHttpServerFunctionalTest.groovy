@@ -86,11 +86,11 @@ class MockHttpServerFunctionalTest {
     void matchersShouldSupercedePriorMatchers() {
         server.respondTo(get(startsWith('/washington'))).withBody('State')
         server.respondTo(get(startsWith('/washington/seattle'))).withBody('City')
-        server.respondTo(get(startsWith('/washington/seattle/confluex'))).withBody('Company')
+        server.respondTo(get(startsWith('/washington/seattle/acme'))).withBody('Company')
 
         def resource =  Client.create().resource("http://localhost:${server.port}/washington")
 
-        assert 'Company' == resource.path('/seattle/confluex').get(String.class)
+        assert 'Company' == resource.path('/seattle/acme').get(String.class)
         assert 'City' == resource.path('/seattle').get(String.class)
         assert 'State' == resource.get(String.class)
     }
