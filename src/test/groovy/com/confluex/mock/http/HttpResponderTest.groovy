@@ -1,4 +1,4 @@
-package com.confluex.mock.http
+package software.sham.http
 
 import org.junit.Before
 import org.junit.Test

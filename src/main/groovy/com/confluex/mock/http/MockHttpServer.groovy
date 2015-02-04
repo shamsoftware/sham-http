@@ -1,6 +1,6 @@
-package com.confluex.mock.http
+package software.sham.http
 
-import com.confluex.mock.http.matchers.HttpRequestMatcher
+import software.sham.http.matchers.HttpRequestMatcher
 import org.mortbay.jetty.Server
 
 class MockHttpServer {

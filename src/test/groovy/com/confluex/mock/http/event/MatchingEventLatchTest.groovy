@@ -1,7 +1,7 @@
-package com.confluex.mock.http.event
+package software.sham.http.event
 
-import com.confluex.mock.http.ClientRequest
-import com.confluex.mock.http.matchers.HttpMatchers
+import software.sham.http.ClientRequest
+import software.sham.http.matchers.HttpMatchers
 import org.junit.Test
 
 import static org.mockito.Mockito.*

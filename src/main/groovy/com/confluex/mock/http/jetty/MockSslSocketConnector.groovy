@@ -1,4 +1,4 @@
-package com.confluex.mock.http.jetty
+package software.sham.http.jetty
 
 import org.mortbay.jetty.security.Password
 import org.mortbay.jetty.security.SslSocketConnector

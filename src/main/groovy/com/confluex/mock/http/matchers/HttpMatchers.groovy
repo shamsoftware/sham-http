@@ -1,6 +1,6 @@
-package com.confluex.mock.http.matchers
+package software.sham.http.matchers
 
-import com.confluex.mock.http.ClientRequest
+import software.sham.http.ClientRequest
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher

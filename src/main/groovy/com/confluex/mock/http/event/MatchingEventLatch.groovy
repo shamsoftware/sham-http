@@ -1,7 +1,7 @@
-package com.confluex.mock.http.event
+package software.sham.http.event
 
-import com.confluex.mock.http.ClientRequest
-import com.confluex.mock.http.matchers.HttpRequestMatcher
+import software.sham.http.ClientRequest
+import software.sham.http.matchers.HttpRequestMatcher
 import groovy.util.logging.Slf4j
 
 import java.util.concurrent.CountDownLatch

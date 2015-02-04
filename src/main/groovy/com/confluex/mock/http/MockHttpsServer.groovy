@@ -1,6 +1,6 @@
-package com.confluex.mock.http
+package software.sham.http
 
-import com.confluex.mock.http.jetty.MockSslSocketConnector
+import software.sham.http.jetty.MockSslSocketConnector
 import org.mortbay.jetty.Server
 import org.springframework.core.io.ClassPathResource
 

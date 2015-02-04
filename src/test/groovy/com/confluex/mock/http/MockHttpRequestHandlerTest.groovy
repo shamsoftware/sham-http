@@ -1,11 +1,11 @@
-package com.confluex.mock.http
+package software.sham.http
 
 import org.junit.Before
 import org.junit.Test
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 
-import static com.confluex.mock.http.matchers.HttpMatchers.*
+import static software.sham.http.matchers.HttpMatchers.*
 
 class MockHttpRequestHandlerTest {
     MockHttpRequestHandler handler

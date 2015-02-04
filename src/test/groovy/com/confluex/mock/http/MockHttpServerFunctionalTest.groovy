@@ -1,4 +1,4 @@
-package com.confluex.mock.http
+package software.sham.http
 
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientHandlerException
@@ -10,7 +10,7 @@ import org.junit.Test
 import javax.ws.rs.core.MediaType
 
 import static javax.servlet.http.HttpServletResponse.*
-import static com.confluex.mock.http.matchers.HttpMatchers.*
+import static software.sham.http.matchers.HttpMatchers.*
 import static org.hamcrest.Matchers.*
 
 import static org.junit.Assert.*

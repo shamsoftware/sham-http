@@ -1,8 +1,8 @@
-package com.confluex.mock.http
+package software.sham.http
 
-import com.confluex.mock.http.event.MatchingEventLatch
-import com.confluex.mock.http.matchers.HttpMatchers
-import com.confluex.mock.http.matchers.HttpRequestMatcher
+import software.sham.http.event.MatchingEventLatch
+import software.sham.http.matchers.HttpMatchers
+import software.sham.http.matchers.HttpRequestMatcher
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import org.mortbay.jetty.handler.AbstractHandler

@@ -1,6 +1,6 @@
-package com.confluex.mock.http.expectations
+package software.sham.http.expectations
 
-import com.confluex.mock.http.ClientRequest
+import software.sham.http.ClientRequest
 
 interface Expectation {
     /**

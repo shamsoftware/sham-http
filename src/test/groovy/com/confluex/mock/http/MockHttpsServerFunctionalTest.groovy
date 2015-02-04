@@ -1,4 +1,4 @@
-package com.confluex.mock.http
+package software.sham.http
 
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientResponse
@@ -8,7 +8,7 @@ import com.sun.jersey.client.urlconnection.HTTPSProperties
 import org.junit.Before
 import org.junit.Test
 
-import static com.confluex.mock.http.matchers.HttpMatchers.*
+import static software.sham.http.matchers.HttpMatchers.*
 
 class MockHttpsServerFunctionalTest {
 

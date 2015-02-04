@@ -1,4 +1,4 @@
-package com.confluex.mock.http
+package software.sham.http
 
 import groovy.util.logging.Slf4j
 import org.springframework.core.io.ByteArrayResource
