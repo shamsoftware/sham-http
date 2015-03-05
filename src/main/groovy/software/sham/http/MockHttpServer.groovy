@@ -1,7 +1,7 @@
 package software.sham.http
 
+import org.eclipse.jetty.server.Server
 import software.sham.http.matchers.HttpRequestMatcher
-import org.mortbay.jetty.Server
 
 class MockHttpServer {
 

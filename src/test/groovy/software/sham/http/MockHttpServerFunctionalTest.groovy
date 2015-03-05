@@ -1,13 +1,16 @@
 package software.sham.http
 
-import com.sun.jersey.api.client.Client
-import com.sun.jersey.api.client.ClientHandlerException
-import com.sun.jersey.api.client.ClientResponse
+import org.glassfish.jersey.client.ClientResponse
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+import javax.ws.rs.client.Client
+import javax.ws.rs.client.ClientBuilder
+import javax.ws.rs.client.Entity
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
+import java.awt.PageAttributes
 
 import static javax.servlet.http.HttpServletResponse.*
 import static software.sham.http.matchers.HttpMatchers.*
@@ -30,33 +33,33 @@ class MockHttpServerFunctionalTest {
 
     @Test
     void newServerShouldBeListening() {
-        ClientResponse response = Client.create().resource("http://localhost:${server.port}/").get(ClientResponse.class)
+        Response response = ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(Response.class)
         assert 404 == response.status
     }
 
     @Test
     void newServerShouldListenOnSpecifiedPort() {
         server = new MockHttpServer(8123)
-        ClientResponse response = Client.create().resource("http://localhost:8123/").get(ClientResponse.class)
+        Response response = ClientBuilder.newClient().target("http://localhost:8123/").request().get(Response.class)
         assert 404 == response.status
     }
 
     @Test
     void stopShouldStopListeningOnPort() {
         server.stop()
-        try {
-            Client.create().resource("http://localhost:${server.port}/").get(ClientResponse.class)
+//        try {
+            ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(Response.class)
             fail("Unexpected listener on port ${server.port} after server.stop()")
-        } catch (ClientHandlerException e) {
-            if (! e.cause instanceof ConnectException) {
-                throw e
-            }
-        }
+//        } catch (ClientHandlerException e) {
+//            if (! e.cause instanceof ConnectException) {
+//                throw e
+//            }
+//        }
     }
 
     @Test
     void shouldRespond404WhenCreated() {
-        ClientResponse response = Client.create().resource("http://localhost:${server.port}/").get(ClientResponse.class)
+        Response response = ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(ClientResponse.class)
         assert 404 == response.status
         assert "Resource not found" == response.getEntity(String)
         assert MediaType.TEXT_PLAIN_TYPE == response.getType()
@@ -65,7 +68,7 @@ class MockHttpServerFunctionalTest {
     @Test
     void shouldRespondOkWithEmptyBodyByDefault() {
         server.respondTo(anyRequest())
-        ClientResponse response = Client.create().resource("http://localhost:${server.port}/").get(ClientResponse.class)
+        Response response = ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(Response.class)
         assert SC_OK == response.status
         assert "" == response.getEntity(String.class)
     }
@@ -75,8 +78,8 @@ class MockHttpServerFunctionalTest {
         server.respondTo(path('/1')).withBody('one')
         server.respondTo(path('/2')).withResource('/http/responses/two.txt')
 
-        String responseOne = Client.create().resource("http://localhost:${server.port}/1").get(String.class)
-        String responseTwo = Client.create().resource("http://localhost:${server.port}/2").get(String.class)
+        String responseOne = ClientBuilder.newClient().target("http://localhost:${server.port}/1").request().get(String.class)
+        String responseTwo = ClientBuilder.newClient().target("http://localhost:${server.port}/2").request().get(String.class)
 
         assert 'one' == responseOne
         assert 'two' == responseTwo
@@ -88,11 +91,11 @@ class MockHttpServerFunctionalTest {
         server.respondTo(get(startsWith('/washington/seattle'))).withBody('City')
         server.respondTo(get(startsWith('/washington/seattle/acme'))).withBody('Company')
 
-        def resource =  Client.create().resource("http://localhost:${server.port}/washington")
+        def resource =  ClientBuilder.newClient().target("http://localhost:${server.port}/washington")
 
-        assert 'Company' == resource.path('/seattle/acme').get(String.class)
-        assert 'City' == resource.path('/seattle').get(String.class)
-        assert 'State' == resource.get(String.class)
+        assert 'Company' == resource.path('/seattle/acme').request().get(String.class)
+        assert 'City' == resource.path('/seattle').request().get(String.class)
+        assert 'State' == resource.request().get(String.class)
     }
 
     @Test
@@ -103,13 +106,13 @@ class MockHttpServerFunctionalTest {
         server.respondTo(delete(startsWith('/restfulResource/'))).withBody('DELETE')
         server.respondTo(method('OPTIONS').and(path('/restfulResource'))).withBody('OPTIONS')
 
-        def resource = Client.create().resource("http://localhost:${server.port}/restfulResource")
+        def resource = ClientBuilder.newClient().target("http://localhost:${server.port}/restfulResource")
 
-        assert 'GET' == resource.get(String.class)
-        assert 'PUT' == resource.path('/1').put(String.class)
-        assert 'POST' == resource.post(String.class)
-        assert 'DELETE' == resource.path('/1').delete(String.class)
-        assert 'OPTIONS' == resource.method('OPTIONS', String.class)
+        assert 'GET' == resource.request().get(String.class)
+        assert 'PUT' == resource.path('/1').request().put(String.class)
+        assert 'POST' == resource.request().post(String.class)
+        assert 'DELETE' == resource.path('/1').request().delete(String.class)
+        assert 'OPTIONS' == resource.request().method('OPTIONS', String.class)
     }
 
     @Test
@@ -118,17 +121,24 @@ class MockHttpServerFunctionalTest {
             request.queryParams['chipmunk']
         }
 
-        assert 'simon' == Client.create().resource("http://localhost:${server.port}/").queryParam('chipmunk', 'simon').get(String)
-        assert 'theodore' == Client.create().resource("http://localhost:${server.port}/").queryParam('chipmunk', 'theodore').get(String)
+        assert 'simon' == ClientBuilder.newClient().target("http://localhost:${server.port}/")
+                .queryParam('chipmunk', 'simon')
+                .request()
+                .get(String)
+        assert 'theodore' == ClientBuilder.newClient().target("http://localhost:${server.port}/")
+                .queryParam('chipmunk', 'theodore')
+                .request()
+                .get(String)
     }
 
     @Test
     void shouldCaptureRequestInformation() {
-        Client.create().resource("http://localhost:${server.port}/cool-api/")
+        ClientBuilder.newClient().target("http://localhost:${server.port}/cool-api/")
+                .request()
                 .header('Accept', 'application/json')
-                .entity('{"foo": "bar"}')
-                .post(ClientResponse.class)
-        Client.create().resource("http://localhost:${server.port}/wicked-api/search?query=foo")
+                .post(Entity.entity('{"foo": "bar"}', MediaType.APPLICATION_JSON_TYPE), ClientResponse.class)
+        ClientBuilder.newClient().target("http://localhost:${server.port}/wicked-api/search?query=foo")
+                .request()
                 .header('Accept', 'application/html')
                 .header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:22.0) Gecko/20100101 Firefox/22.0')
                 .get(ClientResponse.class)
@@ -154,23 +164,23 @@ class MockHttpServerFunctionalTest {
         }
 
         assert ! finished
-        Client.create().resource("http://localhost:${server.port}/ready").get(ClientResponse.class)
+        ClientBuilder.newClient().target("http://localhost:${server.port}/ready").request().get(ClientResponse.class)
         Thread.sleep(100)
         assert ! finished
-        Client.create().resource("http://localhost:${server.port}/steady").get(ClientResponse.class)
+        ClientBuilder.newClient().target("http://localhost:${server.port}/steady").request().get(ClientResponse.class)
         Thread.sleep(100)
         assert ! finished
-        Client.create().resource("http://localhost:${server.port}/go").get(ClientResponse.class)
+        ClientBuilder.newClient().target("http://localhost:${server.port}/go").request().get(ClientResponse.class)
         Thread.sleep(100)
         assert finished
     }
 
     @Test
     void waitForShouldSupportMultipleRequestsAndConsiderPriorRequests() {
-        def areWeThereYet = { Client.create().resource("http://localhost:${server.port}/mom").entity('Are we there yet?') }
+        def areWeThereYet = { ClientBuilder.newClient().target("http://localhost:${server.port}/mom").request() }
 
         2.times {
-            areWeThereYet().post(ClientResponse.class)
+            areWeThereYet().post(Entity.entity('Are we there yet?', MediaType.TEXT_PLAIN_TYPE), ClientResponse.class)
         }
 
         def enoughAlready = false

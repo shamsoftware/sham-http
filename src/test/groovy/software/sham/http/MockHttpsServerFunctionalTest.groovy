@@ -1,12 +1,9 @@
 package software.sham.http
 
-import com.sun.jersey.api.client.Client
-import com.sun.jersey.api.client.ClientResponse
-import com.sun.jersey.api.client.config.ClientConfig
-import com.sun.jersey.api.client.config.DefaultClientConfig
-import com.sun.jersey.client.urlconnection.HTTPSProperties
 import org.junit.Before
 import org.junit.Test
+
+import javax.ws.rs.client.Client
 
 import static software.sham.http.matchers.HttpMatchers.*
 
