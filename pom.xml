@@ -405,7 +405,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <keyname>shamsoftware</keyname>
+                            <keyname>${sham.keyname}</keyname>
                         </configuration>
                     </plugin>
                 </plugins>
