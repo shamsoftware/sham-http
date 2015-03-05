@@ -1,9 +1,13 @@
 package software.sham.http
 
+import org.glassfish.jersey.client.ClientConfig
+import org.glassfish.jersey.client.ClientResponse
 import org.junit.Before
 import org.junit.Test
 
 import javax.ws.rs.client.Client
+import javax.ws.rs.client.ClientBuilder
+import javax.ws.rs.core.Response
 
 import static software.sham.http.matchers.HttpMatchers.*
 
@@ -13,9 +17,9 @@ class MockHttpsServerFunctionalTest {
 
     @Before
     void initSslClient() {
-        ClientConfig config = new DefaultClientConfig()
-        config.properties.put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new HTTPSProperties(null, MockHttpsServer.clientSslContext))
-        sslClient = Client.create(config)
+        sslClient = ClientBuilder.newBuilder()
+                .sslContext(MockHttpsServer.clientSslContext)
+                .build()
     }
 
     @Test
@@ -25,11 +29,11 @@ class MockHttpsServerFunctionalTest {
         server.respondTo(path('/foo').and(queryParam('bar', 'baz'))).withBody('success')
 
 
-        ClientResponse response = sslClient.resource("https://localhost:${server.port}/foo?bar=baz").get(ClientResponse.class)
+        Response response = sslClient.target("https://localhost:${server.port}/foo?bar=baz").request().get(Response.class)
 
         server.stop()
 
         assert 200 == response.status
-        assert 'success' == response.getEntity(String.class)
+        assert 'success' == response.readEntity(String.class)
     }
 }

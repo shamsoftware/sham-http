@@ -1,7 +1,12 @@
 package software.sham.http
 
-import software.sham.http.jetty.MockSslSocketConnector
-import org.mortbay.jetty.Server
+import org.eclipse.jetty.server.HttpConfiguration
+import org.eclipse.jetty.server.HttpConnectionFactory
+import org.eclipse.jetty.server.SecureRequestCustomizer
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.ServerConnector
+import org.eclipse.jetty.util.resource.Resource
+import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.springframework.core.io.ClassPathResource
 
 import javax.net.ssl.KeyManagerFactory
@@ -20,17 +25,29 @@ class MockHttpsServer extends MockHttpServer {
 
     @Override
     protected Server initJettyServer(final int port) {
-        new Server() {{
-            addConnector(new MockSslSocketConnector() {{
-                setKeystore('sham-mock.keystore')
-                setTruststore('sham-mock.truststore')
-                setPassword('password')
-                setKeyPassword('password')
-                setTrustPassword('password')
-                setMaxIdleTime(120000)
-                setPort(port)
-            }});
-        }}
+        def server = new Server()
+        def connector = new ServerConnector(server, createSslContextFactory(), createConnectionFactory(port))
+        connector.port = port
+        connector.idleTimeout = 120000
+        server.addConnector(connector)
+        return server
+    }
+
+    private SslContextFactory createSslContextFactory() {
+        SslContextFactory factory = new SslContextFactory()
+        factory.keyStoreResource = Resource.newClassPathResource('sham-mock.keystore')
+        factory.keyStorePassword = 'password'
+        factory.keyManagerPassword = 'password'
+        factory.trustStoreResource = Resource.newClassPathResource('sham-mock.truststore')
+        factory.trustStorePassword = 'password'
+        return factory
+    }
+
+    private HttpConnectionFactory createConnectionFactory(final int port) {
+        def config = new HttpConfiguration()
+        config.setSecurePort(port)
+        config.addCustomizer(new SecureRequestCustomizer())
+        return new HttpConnectionFactory(config)
     }
 
     static SSLContext getClientSslContext() {

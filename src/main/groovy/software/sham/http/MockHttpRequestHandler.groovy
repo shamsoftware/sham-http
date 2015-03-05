@@ -1,12 +1,14 @@
 package software.sham.http
 
+import org.eclipse.jetty.server.Request
+import org.eclipse.jetty.server.handler.AbstractHandler
 import software.sham.http.event.MatchingEventLatch
 import software.sham.http.matchers.HttpMatchers
 import software.sham.http.matchers.HttpRequestMatcher
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
-import org.mortbay.jetty.handler.AbstractHandler
 
+import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.CopyOnWriteArrayList
@@ -21,21 +23,6 @@ class MockHttpRequestHandler extends AbstractHandler {
 
     public MockHttpRequestHandler() {
         respondTo(HttpMatchers.anyRequest()).withStatus(404).withHeader('Content-Type', 'text/plain').withBody("Resource not found")
-    }
-
-    void handle(String uri, HttpServletRequest request, HttpServletResponse response, int dispatch) {
-        def clientRequest = new ClientRequest(request)
-        log.debug "Handling request $clientRequest"
-        requests << clientRequest
-        HttpRequestMatcher matcher = matchers.find { matcher ->
-            matcher.matches(clientRequest)
-        }
-        responders[matcher]?.render(clientRequest, response)
-        synchronized(latches) {
-            latches.each {
-                it.addEvent(clientRequest)
-            }
-        }
     }
 
     HttpResponderBuilder respondTo(HttpRequestMatcher matcher) {
@@ -53,5 +40,21 @@ class MockHttpRequestHandler extends AbstractHandler {
             latches << latch
         }
         latch.await(timeoutMs)
+    }
+
+    @Override
+    void handle(String s, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        def clientRequest = new ClientRequest(request)
+        log.debug "Handling request $clientRequest"
+        requests << clientRequest
+        HttpRequestMatcher matcher = matchers.find { matcher ->
+            matcher.matches(clientRequest)
+        }
+        responders[matcher]?.render(clientRequest, response)
+        synchronized(latches) {
+            latches.each {
+                it.addEvent(clientRequest)
+            }
+        }
     }
 }

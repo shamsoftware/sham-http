@@ -1,5 +1,6 @@
 package software.sham.http
 
+import groovy.util.logging.Slf4j
 import org.junit.Before
 import org.junit.Test
 import org.springframework.mock.web.MockHttpServletRequest
@@ -7,6 +8,7 @@ import org.springframework.mock.web.MockHttpServletResponse
 
 import static software.sham.http.matchers.HttpMatchers.*
 
+@Slf4j
 class MockHttpRequestHandlerTest {
     MockHttpRequestHandler handler
 
@@ -28,13 +30,15 @@ class MockHttpRequestHandlerTest {
                 def request = new MockHttpServletRequest()
                 def response = new MockHttpServletResponse()
                 try {
-                    handler.handle(uri, request, response, 0)
+                    handler.handle(uri, null, request, response)
                 } catch (e) {
+                    log.debug "Captured error $e"
                     errors << e
                 }
             }
 
         }
+
         assert handler.waitFor(matcher, requestCount, 10000)
     }
 }

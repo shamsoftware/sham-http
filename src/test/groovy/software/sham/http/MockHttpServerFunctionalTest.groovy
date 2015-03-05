@@ -1,10 +1,10 @@
 package software.sham.http
 
-import org.glassfish.jersey.client.ClientResponse
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+import javax.ws.rs.ProcessingException
 import javax.ws.rs.client.Client
 import javax.ws.rs.client.ClientBuilder
 import javax.ws.rs.client.Entity
@@ -47,22 +47,22 @@ class MockHttpServerFunctionalTest {
     @Test
     void stopShouldStopListeningOnPort() {
         server.stop()
-//        try {
+        try {
             ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(Response.class)
             fail("Unexpected listener on port ${server.port} after server.stop()")
-//        } catch (ClientHandlerException e) {
-//            if (! e.cause instanceof ConnectException) {
-//                throw e
-//            }
-//        }
+        } catch (ProcessingException e) {
+            if (! e.cause instanceof ConnectException) {
+                throw e
+            }
+        }
     }
 
     @Test
     void shouldRespond404WhenCreated() {
-        Response response = ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(ClientResponse.class)
+        Response response = ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(Response.class)
         assert 404 == response.status
-        assert "Resource not found" == response.getEntity(String)
-        assert MediaType.TEXT_PLAIN_TYPE == response.getType()
+        assert "Resource not found" == response.readEntity(String)
+        assert MediaType.TEXT_PLAIN_TYPE == response.getMediaType()
     }
 
     @Test
@@ -70,7 +70,7 @@ class MockHttpServerFunctionalTest {
         server.respondTo(anyRequest())
         Response response = ClientBuilder.newClient().target("http://localhost:${server.port}/").request().get(Response.class)
         assert SC_OK == response.status
-        assert "" == response.getEntity(String.class)
+        assert "" == response.readEntity(String.class)
     }
 
     @Test
@@ -109,8 +109,8 @@ class MockHttpServerFunctionalTest {
         def resource = ClientBuilder.newClient().target("http://localhost:${server.port}/restfulResource")
 
         assert 'GET' == resource.request().get(String.class)
-        assert 'PUT' == resource.path('/1').request().put(String.class)
-        assert 'POST' == resource.request().post(String.class)
+        assert 'PUT' == resource.path('/1').request().put(Entity.entity('', MediaType.TEXT_PLAIN_TYPE), String.class)
+        assert 'POST' == resource.request().post(Entity.entity('', MediaType.TEXT_PLAIN_TYPE), String.class)
         assert 'DELETE' == resource.path('/1').request().delete(String.class)
         assert 'OPTIONS' == resource.request().method('OPTIONS', String.class)
     }
@@ -136,12 +136,12 @@ class MockHttpServerFunctionalTest {
         ClientBuilder.newClient().target("http://localhost:${server.port}/cool-api/")
                 .request()
                 .header('Accept', 'application/json')
-                .post(Entity.entity('{"foo": "bar"}', MediaType.APPLICATION_JSON_TYPE), ClientResponse.class)
+                .post(Entity.entity('{"foo": "bar"}', MediaType.APPLICATION_JSON_TYPE), Response.class)
         ClientBuilder.newClient().target("http://localhost:${server.port}/wicked-api/search?query=foo")
                 .request()
                 .header('Accept', 'application/html')
                 .header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:22.0) Gecko/20100101 Firefox/22.0')
-                .get(ClientResponse.class)
+                .get(Response.class)
 
         assert 2 == server.requests.size()
         assert 1 == server.requests.findAll { it.method == 'GET' }.size()
@@ -164,13 +164,13 @@ class MockHttpServerFunctionalTest {
         }
 
         assert ! finished
-        ClientBuilder.newClient().target("http://localhost:${server.port}/ready").request().get(ClientResponse.class)
+        ClientBuilder.newClient().target("http://localhost:${server.port}/ready").request().get(Response.class)
         Thread.sleep(100)
         assert ! finished
-        ClientBuilder.newClient().target("http://localhost:${server.port}/steady").request().get(ClientResponse.class)
+        ClientBuilder.newClient().target("http://localhost:${server.port}/steady").request().get(Response.class)
         Thread.sleep(100)
         assert ! finished
-        ClientBuilder.newClient().target("http://localhost:${server.port}/go").request().get(ClientResponse.class)
+        ClientBuilder.newClient().target("http://localhost:${server.port}/go").request().get(Response.class)
         Thread.sleep(100)
         assert finished
     }
@@ -180,7 +180,7 @@ class MockHttpServerFunctionalTest {
         def areWeThereYet = { ClientBuilder.newClient().target("http://localhost:${server.port}/mom").request() }
 
         2.times {
-            areWeThereYet().post(Entity.entity('Are we there yet?', MediaType.TEXT_PLAIN_TYPE), ClientResponse.class)
+            areWeThereYet().post(Entity.entity('Are we there yet?', MediaType.TEXT_PLAIN_TYPE), Response.class)
         }
 
         def enoughAlready = false
@@ -190,12 +190,12 @@ class MockHttpServerFunctionalTest {
         }
 
         7.times {
-            areWeThereYet().post(ClientResponse.class)
+            areWeThereYet().post(Entity.entity('Are we there yet?', MediaType.TEXT_PLAIN_TYPE), Response.class)
             Thread.sleep(100)
             assert ! enoughAlready
         }
 
-        areWeThereYet().post(ClientResponse.class)
+        areWeThereYet().post(Entity.entity('Are we there yet?', MediaType.TEXT_PLAIN_TYPE), Response.class)
         Thread.sleep(100)
         assert enoughAlready
     }
