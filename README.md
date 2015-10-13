@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/shamsoftware/sham-http.png?branch=master)](https://travis-ci.org/shamsoftware/sham-http)
+
 
 # sham.software Mock HTTP API
 
@@ -198,14 +198,24 @@ MockHttpServer server = new MockHttpServer()
 int thePortItChose = server.port
 
 ```
-### Supporting SSL
 
-To mock an HTTPS server, use MockHttpsServer in the place of MockHttpServer.  Your HTTPS client will need to use
-a keystore that contains the mock server's certificate.  sham-mock.keystore and sham-mock.truststore is available on the classpath,
-and its password is password.
+### Supporting SSL
+To mock an HTTPS server, use MockHttpsServer in the place of MockHttpServer.
+
+```groovy
+
+MockHttpsServer server = new MockHttpsServer(443)
+
+```
+
+Your HTTPS client will need to use a keystore that contains the mock server's certificate.  
+sham-mock.keystore and sham-mock.truststore is available on the classpath, and its password 
+is password.
 
 The commands used to generate the key, certificate, and stores is as follows:
-#openssl genrsa 2048 > sham-mock.key
+
+```
+openssl genrsa 2048 > sham-mock.key
 openssl genrsa -des3 -out sham-mock.key 2048
 
 openssl req -new -x509 -nodes -sha1 -subj '/O=Sham/CN=localhost' -days 3650 -key sham-mock.key > sham-mock.crt
@@ -214,13 +224,8 @@ openssl pkcs12 -inkey sham-mock.key -in sham-mock.crt -export -out cert-key.pkcs
 keytool -importkeystore -srckeystore cert-key.pkcs12 -srcstoretype pkcs12 -destkeystore sham-mock.keystore
 
 keytool -import -alias 1 -file sham-mock.crt -keystore sham-mock.truststore
-
-
-```groovy
-
-MockHttpsServer server = new MockHttpsServer(443)
-
 ```
+
 # License
 
    Copyright 2015 Ryan Hoegg.
