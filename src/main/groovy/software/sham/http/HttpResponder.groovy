@@ -16,10 +16,12 @@ class HttpResponder {
     int status = SC_OK
     Resource body = new ByteArrayResource(''.bytes)
     Closure bodyClosure
+    long delay = 0
 
     Map<String, String> headers = [:]
 
     void render(ClientRequest request, HttpServletResponse response) {
+        Thread.sleep(delay)
         response.status = status
         def body = (bodyClosure?.call(request) ?: body.inputStream.text) // this is a memory hog
         log.debug "Responding $status with headers $headers and body: $body"
@@ -71,6 +73,11 @@ class HttpResponderBuilder {
     HttpResponderBuilder asGzipped() {
         responder.headers['Content-Encoding'] = 'gzip'
         responder.asGzipped = true
+        this
+    }
+
+    HttpResponderBuilder withDelay(long milliseconds) {
+        responder.delay = milliseconds
         this
     }
 }

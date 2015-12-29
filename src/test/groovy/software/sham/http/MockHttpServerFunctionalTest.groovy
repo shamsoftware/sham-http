@@ -1,5 +1,6 @@
 package software.sham.http
 
+import groovy.util.logging.Slf4j
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -18,6 +19,7 @@ import static org.hamcrest.Matchers.*
 
 import static org.junit.Assert.*
 
+@Slf4j
 class MockHttpServerFunctionalTest {
     private MockHttpServer server
 
@@ -198,5 +200,20 @@ class MockHttpServerFunctionalTest {
         areWeThereYet().post(Entity.entity('Are we there yet?', MediaType.TEXT_PLAIN_TYPE), Response.class)
         Thread.sleep(100)
         assert enoughAlready
+    }
+
+    @Test
+    void shouldDelay() {
+        server.respondTo(get(startsWith('/laggard'))).withBody('I made it').withDelay(5000)
+
+        def request = ClientBuilder.newClient().target("http://localhost:${server.port}/laggard").request().async()
+
+        log.debug "Requesting /laggard"
+        // Note that we wait an extra 1000ms here because Jetty seems to take a while before handing off the request
+        def responseFuture = request.get()
+        Thread.sleep(3000)
+        assert ! responseFuture.done
+        Thread.sleep(3000);
+        assert responseFuture.done
     }
 }
