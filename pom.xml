@@ -55,7 +55,7 @@
         <spring.version>3.2.10.RELEASE</spring.version>
         <jersey.version>2.11</jersey.version>
         <log4j.version>2.1</log4j.version>
-        <sl4fj.version>1.7.7</sl4fj.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <jetty.version>9.0.7.v20131107</jetty.version>
     </properties>
     <build>
