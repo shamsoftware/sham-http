@@ -15,6 +15,9 @@ import javax.net.ssl.TrustManagerFactory
 import java.security.KeyStore
 
 class MockHttpsServer extends MockHttpServer {
+
+    private static final String DEFAULT_PASSWORD = 'password'
+
     MockHttpsServer() {
         super()
     }
@@ -36,10 +39,10 @@ class MockHttpsServer extends MockHttpServer {
     private SslContextFactory createSslContextFactory() {
         SslContextFactory factory = new SslContextFactory()
         factory.keyStoreResource = Resource.newClassPathResource('sham-mock.keystore')
-        factory.keyStorePassword = 'password'
-        factory.keyManagerPassword = 'password'
+        factory.keyStorePassword = DEFAULT_PASSWORD
+        factory.keyManagerPassword = DEFAULT_PASSWORD
         factory.trustStoreResource = Resource.newClassPathResource('sham-mock.truststore')
-        factory.trustStorePassword = 'password'
+        factory.trustStorePassword = DEFAULT_PASSWORD
         return factory
     }
 
@@ -59,7 +62,7 @@ class MockHttpsServer extends MockHttpServer {
 
     static TrustManagerFactory getTrustManagerFactory() {
         KeyStore truststore = KeyStore.getInstance('JKS')
-        truststore.load(new ClassPathResource('sham-mock.keystore').inputStream, 'password'.toCharArray())
+        truststore.load(new ClassPathResource('sham-mock.keystore').inputStream, DEFAULT_PASSWORD.toCharArray())
         TrustManagerFactory tmf = TrustManagerFactory.getInstance('SunX509')
         tmf.init(truststore)
         return tmf
