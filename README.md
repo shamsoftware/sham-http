@@ -139,7 +139,7 @@ server.respondTo(path('/not-found'))
     .withStatus(404)
     .withBody('Sorry, buddy')
     .withHeader('Content-Type', 'text/plain')
-    .withHeader('Last-Modified', 'Tue, 15 Nov 1994 12:45:26 GMT')
+    .withHeader('Last-Modified', 'Tue, 15 Jan 2017 12:45:26 GMT')
 
 ```
 
